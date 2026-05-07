@@ -1,0 +1,127 @@
+/* Main Home Section */
+.home {
+  min-height: 100vh;
+  padding: 120px 60px 60px; /* Space for Header */
+  background: #f4b400;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  box-sizing: border-box;
+}
+
+/* Left Content */
+.home-left {
+  max-width: 550px;
+}
+
+.home-left h1 {
+  font-size: 4.5rem;
+  font-weight: bold;
+  color: black;
+  line-height: 1.1;
+  margin-bottom: 20px;
+}
+
+.home-left p {
+  font-size: 1.1rem;
+  color: #222;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+/* Buttons */
+.home-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.btn-dark {
+  background: black;
+  color: white;
+  border: none;
+  padding: 12px 26px;
+  border-radius: 25px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-dark:hover {
+  background: #222;
+}
+
+.btn-video {
+  background: transparent;
+  border: none;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: black;
+}
+
+.btn-video:hover {
+  text-decoration: underline;
+}
+
+/* Right Content */
+.home-right {
+  position: relative;
+}
+
+/* Door Effect */
+.door {
+  width: 260px;
+  height: 420px;
+  background: linear-gradient(to bottom, #1f3b5c, #0b1c2d);
+  border-radius: 150px 150px 20px 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+}
+
+/* Image Inside Door */
+.door img {
+  width: 170px;
+  position: absolute;
+  bottom: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 900px) {
+
+  .home {
+    flex-direction: column;
+    text-align: center;
+    padding: 120px 25px 40px;
+  }
+
+  .home-left {
+    margin-bottom: 40px;
+  }
+
+  .home-left h1 {
+    font-size: 3rem;
+  }
+
+  .home-buttons {
+    justify-content: center;
+  }
+
+  .door {
+    width: 220px;
+    height: 350px;
+  }
+
+  .door img {
+    width: 140px;
+  }
+
+}

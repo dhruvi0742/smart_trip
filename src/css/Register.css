@@ -1,0 +1,166 @@
+/* Background */
+.register-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: linear-gradient(-45deg,
+      #6a11cb,
+      #2575fc,
+      #ff416c,
+      #ff4b2b);
+
+  background-size: 400% 400%;
+  animation: gradientBG 20s ease infinite;
+  font-family: "Poppins", sans-serif;
+}
+
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Glass Card */
+.glass-card {
+  backdrop-filter: blur(25px);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 2rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+
+  padding: 3rem 2rem;
+  width: 100%;
+  max-width: 420px;
+  color: #fff;
+  animation: fadeIn 1s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Title */
+.glass-card h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+}
+
+/* Floating Input */
+.floating-input {
+  position: relative;
+  margin-bottom: 1.75rem;
+}
+
+.floating-input input {
+  width: 100%;
+  border: none;
+  border-bottom: 2px solid rgba(255,255,255,0.7);
+  background: transparent;
+
+  padding: 0.75rem 0 0.25rem 0;
+  color: white;
+  font-size: 1rem;
+  outline: none;
+}
+
+.floating-input input::placeholder {
+  color: transparent;
+}
+
+.floating-input label {
+  position: absolute;
+  left: 0;
+  top: 0.75rem;
+
+  color: rgba(255,255,255,0.7);
+  font-size: 1rem;
+  pointer-events: none;
+
+  transition: 0.3s;
+}
+
+.floating-input input:focus ~ label,
+.floating-input input:not(:placeholder-shown) ~ label {
+  top: -0.5rem;
+  font-size: 0.75rem;
+  color: #ff4b2b;
+}
+
+.floating-input input:focus {
+  border-bottom-color: #ff4b2b;
+}
+
+/* Icons */
+.icon {
+  position: absolute;
+  right: 0;
+  top: 0.75rem;
+
+  font-size: 1.2rem;
+  color: rgba(255,255,255,0.6);
+}
+
+.floating-input input:focus ~ .icon {
+  color: #ff6b81;
+  transform: scale(1.2);
+}
+
+/* Button */
+.btn-gradient {
+  width: 100%;
+  padding: 0.75rem;
+
+  border: none;
+  border-radius: 9999px;
+
+  background: linear-gradient(90deg,
+      #ff416c,
+      #ff4b2b,
+      #6a11cb,
+      #2575fc);
+
+  background-size: 300% 300%;
+
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+
+  cursor: pointer;
+  transition: 0.5s;
+}
+
+.btn-gradient:hover {
+  background-position: 100% 0;
+  transform: scale(1.05);
+}
+
+/* Error */
+.error-box {
+  background: rgba(255, 0, 0, 0.2);
+  padding: 0.75rem;
+  border-radius: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Login Text */
+.login-text {
+  text-align: center;
+  margin-top: 1rem;
+  opacity: 0.8;
+}
+
+.login-text a {
+  color: white;
+  font-weight: bold;
+  text-decoration: underline;
+}

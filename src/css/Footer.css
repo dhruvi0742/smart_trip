@@ -1,0 +1,28 @@
+.footer {
+  background: #111;
+  color: white;
+  padding: 40px 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-left span {
+  font-size: 14px;
+  color: #aaa;
+}
+
+.footer-links {
+  display: flex;
+  gap: 20px;
+}
+
+.footer-links p {
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.footer-right {
+  font-size: 14px;
+  color: #aaa;
+}

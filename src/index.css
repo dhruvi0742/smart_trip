@@ -1,0 +1,53 @@
+@import "leaflet/dist/leaflet.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===== Global Styles ===== */
+body {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== Glass Effect ===== */
+.glass {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* ===== Floating Animation ===== */
+.floating {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%   { transform: translateY(0px); }
+  50%  { transform: translateY(-20px); }
+  100% { transform: translateY(0px); }
+}
+
+/* ===== Landmark Shadow ===== */
+.landmark-shadow {
+  filter: drop-shadow(0 20px 30px rgba(0,0,0,0.25));
+}
+
+/* ===== Nav Pill Effect (Mindtrip Style) ===== */
+.nav-pill {
+  @apply italic text-sm 
+         px-4 py-2 rounded-full 
+         transition-all duration-300 
+         hover:bg-black/5 
+         focus:bg-black/5 
+         cursor-pointer;
+}
+body {
+  @apply bg-background-light font-jakarta;
+}
+body {
+  @apply font-sans bg-white text-black overflow-x-hidden;
+}
+
