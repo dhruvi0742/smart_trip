@@ -1,10 +1,18 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-export default function CreateTrip() {
+import {
+  MapPinned,
+  CalendarDays,
+  Wallet,
+  Users,
+  Plane,
+  Sparkles
+} from "lucide-react";
+
+export default function CreateTrip({ onTripGenerated }) {
+
   const userId = localStorage.getItem("userId");
-  const navigate = useNavigate();
 
   const [form, setForm] = useState({
     from: "",
@@ -18,123 +26,421 @@ export default function CreateTrip() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(null);
+
   const [error, setError] = useState("");
 
+  // ================= HANDLE CHANGE =================
+
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value
+    });
   };
 
+  // ================= CALCULATE DAYS =================
+
   const calculateDays = () => {
-    if (!form.startDate || !form.endDate) return 5;
+
+    if (!form.startDate || !form.endDate) return 1;
+
     const start = new Date(form.startDate);
+
     const end = new Date(form.endDate);
+
     const diffTime = end - start;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+    const diffDays =
+      Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
     return Math.max(1, diffDays);
   };
 
+  // ================= SUBMIT =================
+
   const handleSubmit = async (e) => {
+
     e.preventDefault();
+
     if (!userId) {
+
       setError("Please login first");
+
       return;
     }
+
     setLoading(true);
+
     setError("");
-    setSuccess(null);
 
     const days = calculateDays();
 
     try {
-      const response = await axios.post("http://localhost:5000/api/trip/create", {
-        userId,
-        ...form,
-        days
-      });
+
+      const response = await axios.post(
+        "http://localhost:5000/api/trip/create",
+        {
+          userId,
+          ...form,
+          days
+        }
+      );
 
       if (response.data.success) {
-        setSuccess({
-          trip: response.data.trip,
-          data: response.data.data // JSON structure
-        });
-        // Auto redirect after 3s
-        setTimeout(() => navigate("/trips"), 3000);
+
+        onTripGenerated();
+
       }
+
     } catch (err) {
-      setError(err.response?.data?.msg || "Failed to generate trip");
+
+      setError(
+        err.response?.data?.msg ||
+        "Failed to generate trip"
+      );
+
     } finally {
+
       setLoading(false);
     }
   };
 
+  // ================= UI =================
+
   return (
-    <div className="flex justify-center items-center w-full p-10 min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="bg-white rounded-3xl shadow-2xl p-10 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
 
-        <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-          Plan Your Dream Trip ✈️
-        </h1>
-        <p className="text-gray-500 mb-8 text-lg">
-          AI-powered itinerary with hotels, transport & booking
-        </p>
+    <div
+      className="
+      min-h-screen
+      w-full
+      bg-gradient-to-br
+      from-[#FFFBE6]
+      via-[#FFF9D6]
+      to-[#FFF3BF]
+      flex
+      justify-center
+      items-center
+      p-3
+      md:p-6
+    "
+    >
 
-        {success ? (
-          <div className="space-y-4 p-8 bg-green-50 border-2 border-green-200 rounded-2xl">
-            <h2 className="text-2xl font-bold text-green-800">✅ Trip Generated Successfully!</h2>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div><strong>{success.trip.from}</strong> → <strong>{success.trip.to}</strong></div>
-              <div>{success.trip.days} days • ₹{success.trip.booking.totalPrice}</div>
+      {/* MAIN CARD */}
+      <div
+        className="
+        w-full
+        max-w-4xl
+        h-[92vh]
+        overflow-y-auto
+        bg-white/90
+        backdrop-blur-xl
+        rounded-[35px]
+        shadow-2xl
+        border
+        border-[#F4C400]/20
+      "
+      >
+
+        {/* TOP SECTION */}
+        <div
+          className="
+          bg-[#F4C400]
+          p-7
+          md:p-8
+          text-black
+          relative
+        "
+        >
+
+          <div
+            className="
+            absolute
+            top-0
+            right-0
+            w-56
+            h-56
+            bg-white/10
+            rounded-full
+            blur-3xl
+          "
+          />
+
+          <div className="relative z-10">
+
+            <div className="flex items-center gap-4 mb-4">
+
+              <div
+                className="
+                w-14
+                h-14
+                rounded-2xl
+                bg-black/10
+                flex
+                items-center
+                justify-center
+              "
+              >
+
+                <Plane
+                  size={28}
+                  className="text-black"
+                />
+
+              </div>
+
+              <div>
+
+                <h1
+                  className="
+                  text-3xl
+                  md:text-4xl
+                  font-black
+                "
+                >
+
+                  Create Smart Trip
+
+                </h1>
+
+                <p className="mt-1 text-black/70">
+
+                  AI-powered travel planner
+
+                </p>
+
+              </div>
+
             </div>
-            <pre className="bg-white p-4 rounded-xl text-xs overflow-auto max-h-40 font-mono">
-              {JSON.stringify(success.data, null, 2)}
-            </pre>
-            <button
-              onClick={() => navigate("/trips")}
-              className="w-full bg-green-600 text-white py-3 rounded-xl font-bold"
+
+            <div
+              className="
+              flex
+              items-center
+              gap-2
+              bg-black/10
+              w-fit
+              px-4
+              py-2
+              rounded-full
+              mt-3
+            "
             >
-              View All Trips →
-            </button>
+
+              <Sparkles
+                size={16}
+                className="text-black"
+              />
+
+              <span className="text-sm text-black">
+
+                Smart itinerary enabled
+
+              </span>
+
+            </div>
+
           </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-              <input
-                name="from"
-                placeholder="From (City)"
-                className="input"
-                onChange={handleChange}
-                required
-              />
-              <input
-                name="to"
-                placeholder="To (Destination)"
-                className="input"
-                onChange={handleChange}
-                required
-              />
+
+        </div>
+
+        {/* FORM SECTION */}
+        <div className="p-5 md:p-8">
+
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-6"
+          >
+
+            {/* FROM & TO */}
+            <div className="grid md:grid-cols-2 gap-5">
+
+              <div>
+
+                <label className="label">
+
+                  From City
+
+                </label>
+
+                <div className="inputBox">
+
+                  <MapPinned
+                    size={18}
+                    className="text-[#B8860B]"
+                  />
+
+                  <input
+                    type="text"
+                    name="from"
+                    placeholder="Departure city"
+                    value={form.from}
+                    onChange={handleChange}
+                    className="inputStyle"
+                    required
+                  />
+
+                </div>
+
+              </div>
+
+              <div>
+
+                <label className="label">
+
+                  Destination
+
+                </label>
+
+                <div className="inputBox">
+
+                  <Plane
+                    size={18}
+                    className="text-[#B8860B]"
+                  />
+
+                  <input
+                    type="text"
+                    name="to"
+                    placeholder="Destination city"
+                    value={form.to}
+                    onChange={handleChange}
+                    className="inputStyle"
+                    required
+                  />
+
+                </div>
+
+              </div>
+
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <input
-                type="date"
-                name="startDate"
-                className="input"
-                onChange={handleChange}
-              />
-              <input
-                type="date"
-                name="endDate"
-                className="input"
-                onChange={handleChange}
-              />
-              <p className="col-span-2 text-sm text-gray-500">Days: <strong>{calculateDays()}</strong></p>
+            {/* DATES */}
+            <div className="grid md:grid-cols-2 gap-5">
+
+              <div>
+
+                <label className="label">
+
+                  Start Date
+
+                </label>
+
+                <div className="inputBox">
+
+                  <CalendarDays
+                    size={18}
+                    className="text-[#B8860B]"
+                  />
+
+                  <input
+                    type="date"
+                    name="startDate"
+                    value={form.startDate}
+                    onChange={handleChange}
+                    className="inputStyle"
+                  />
+
+                </div>
+
+              </div>
+
+              <div>
+
+                <label className="label">
+
+                  End Date
+
+                </label>
+
+                <div className="inputBox">
+
+                  <CalendarDays
+                    size={18}
+                    className="text-[#B8860B]"
+                  />
+
+                  <input
+                    type="date"
+                    name="endDate"
+                    value={form.endDate}
+                    onChange={handleChange}
+                    className="inputStyle"
+                  />
+
+                </div>
+
+              </div>
+
             </div>
 
+            {/* DAYS */}
+            <div
+              className="
+              bg-[#FFF8CC]
+              border
+              border-[#F4C400]
+              rounded-2xl
+              p-4
+              flex
+              justify-between
+              items-center
+            "
+            >
+
+              <div>
+
+                <p className="text-gray-500 text-sm">
+
+                  Trip Duration
+
+                </p>
+
+                <h2 className="text-2xl font-bold text-[#B8860B]">
+
+                  {calculateDays()} Days
+
+                </h2>
+
+              </div>
+
+              <CalendarDays
+                size={34}
+                className="text-[#F4C400]"
+              />
+
+            </div>
+
+            {/* BUDGET */}
             <div>
-              <label className="text-sm font-medium">
-                Budget ₹{form.budget.toLocaleString()}
-              </label>
+
+              <div className="flex justify-between mb-3">
+
+                <label className="label flex items-center gap-2">
+
+                  <Wallet
+                    size={18}
+                    className="text-[#B8860B]"
+                  />
+
+                  Budget
+
+                </label>
+
+                <span
+                  className="
+                  text-lg
+                  font-bold
+                  text-[#B8860B]
+                "
+                >
+
+                  ₹{form.budget.toLocaleString()}
+
+                </span>
+
+              </div>
+
               <input
                 type="range"
                 min="5000"
@@ -143,69 +449,234 @@ export default function CreateTrip() {
                 name="budget"
                 value={form.budget}
                 onChange={handleChange}
-                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <input
-                type="number"
-                name="people"
-                min="1"
-                max="10"
-                placeholder="People"
-                className="input"
-                onChange={handleChange}
-                required
+                className="
+                w-full
+                accent-[#F4C400]
+                cursor-pointer
+              "
               />
 
-              <select
-                name="travelType"
-                className="input"
-                onChange={handleChange}
-                required
-              >
-                <option value="">Travel Type</option>
-                <option>Adventure</option>
-                <option>Relaxation</option>
-                <option>Family</option>
-                <option>Honeymoon</option>
-                <option>Group</option>
-              </select>
             </div>
 
-            <textarea
-              name="notes"
-              placeholder="Special requirements, preferences..."
-              className="input h-32"
-              onChange={handleChange}
-            />
+            {/* PEOPLE & TYPE */}
+            <div className="grid md:grid-cols-2 gap-5">
 
-            {error && (
-              <div className="p-4 bg-red-100 border border-red-400 text-red-700 rounded-xl">
-                {error}
+              <div>
+
+                <label className="label">
+
+                  Travelers
+
+                </label>
+
+                <div className="inputBox">
+
+                  <Users
+                    size={18}
+                    className="text-[#B8860B]"
+                  />
+
+                  <input
+                    type="number"
+                    min="1"
+                    max="10"
+                    name="people"
+                    value={form.people}
+                    onChange={handleChange}
+                    className="inputStyle"
+                    required
+                  />
+
+                </div>
+
               </div>
+
+              <div>
+
+                <label className="label">
+
+                  Travel Type
+
+                </label>
+
+                <div className="inputBox">
+
+                  <Sparkles
+                    size={18}
+                    className="text-[#B8860B]"
+                  />
+
+                  <select
+                    name="travelType"
+                    value={form.travelType}
+                    onChange={handleChange}
+                    className="inputStyle bg-transparent"
+                    required
+                  >
+
+                    <option value="">
+                      Select Type
+                    </option>
+
+                    <option>
+                      Adventure
+                    </option>
+
+                    <option>
+                      Relaxation
+                    </option>
+
+                    <option>
+                      Family
+                    </option>
+
+                    <option>
+                      Honeymoon
+                    </option>
+
+                    <option>
+                      Group
+                    </option>
+
+                  </select>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            {/* NOTES */}
+            <div>
+
+              <label className="label">
+
+                Additional Notes
+
+              </label>
+
+              <textarea
+                name="notes"
+                placeholder="Food, activities, hotel preferences..."
+                value={form.notes}
+                onChange={handleChange}
+                className="
+                w-full
+                h-32
+                rounded-3xl
+                border
+                border-[#F4C400]/30
+                bg-[#FFFBE6]
+                p-5
+                outline-none
+                focus:ring-4
+                focus:ring-[#F4C400]/20
+                transition
+                resize-none
+              "
+              />
+
+            </div>
+
+            {/* ERROR */}
+            {error && (
+
+              <div
+                className="
+                bg-red-100
+                border
+                border-red-300
+                text-red-600
+                rounded-2xl
+                p-4
+                font-medium
+              "
+              >
+
+                {error}
+
+              </div>
+
             )}
 
+            {/* BUTTON */}
             <button
               type="submit"
-              disabled={loading || !userId}
-              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 rounded-2xl font-bold text-xl flex justify-center items-center gap-2 shadow-xl hover:shadow-2xl transition-all disabled:opacity-50"
+              disabled={loading}
+              className="
+              w-full
+              py-4
+              rounded-3xl
+              bg-[#F4C400]
+              hover:bg-[#E5B800]
+              text-black
+              text-lg
+              font-bold
+              shadow-xl
+              hover:scale-[1.01]
+              transition-all
+              duration-300
+              disabled:opacity-50
+            "
             >
-              {loading ? (
-                <>
-                  <span className="animate-spin">⏳</span>
-                  Generating smart itinerary...
-                </>
-              ) : (
-                <>
-                  Create Smart Trip 🚀
-                </>
-              )}
+
+              {loading
+                ? "Generating Smart Trip..."
+                : "Create Smart Trip ✨"}
+
             </button>
+
           </form>
-        )}
+
+        </div>
+
       </div>
+
+      {/* HELPERS */}
+      <style>
+        {`
+          .label{
+            display:block;
+            margin-bottom:8px;
+            font-weight:600;
+            color:#374151;
+          }
+
+          .inputBox{
+            display:flex;
+            align-items:center;
+            gap:12px;
+            border:1px solid rgba(244,196,0,0.3);
+            background:#FFFBE6;
+            padding:14px 16px;
+            border-radius:22px;
+            transition:0.3s;
+          }
+
+          .inputBox:focus-within{
+            border-color:#F4C400;
+            box-shadow:0 0 0 4px rgba(244,196,0,0.15);
+            background:white;
+          }
+
+          .inputStyle{
+            width:100%;
+            background:transparent;
+            outline:none;
+            font-size:15px;
+          }
+
+          ::-webkit-scrollbar{
+            width:8px;
+          }
+
+          ::-webkit-scrollbar-thumb{
+            background:#F4C400;
+            border-radius:20px;
+          }
+        `}
+      </style>
+
     </div>
   );
 }

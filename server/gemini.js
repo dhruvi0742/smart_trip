@@ -1,30 +1,35 @@
 const axios = require("axios");
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
+const AI_PROVIDER = process.env.AI_PROVIDER || "groq";
+
+// ================= MAIN =================
 
 async function generateTripPlan(conversationHistory) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+  if (AI_PROVIDER === "groq") {
+    return await generateWithGroq(conversationHistory);
+  } else {
+    return "⚠️ Only Groq is enabled";
+  }
+}
 
-  const systemInstruction = `
-You are a professional AI travel planner.
+// ================= SYSTEM PROMPT =================
+const SYSTEM_PROMPT = `
+You are a Smart Trip AI assistant.
 
-STRICT RULES:
+RULES:
 
-1. Ask ONLY ONE question at a time.
-2. Follow this order strictly:
-   - Destination
-   - From
-   - Travel date
-   - Duration (number of days)
-   - Number of travelers
-   - Budget
-   - Preferences
-3. If any information is missing, ask ONLY the next missing item.
-4. Do NOT ask multiple questions.
-5. Keep questions short and natural.
-6. When ALL details are collected → generate FINAL PLAN.
+1. If user already provides details (destination, date, transport, etc), DO NOT ask again.
+2. Only ask questions if something is clearly missing.
+3. If enough details are available → directly generate FULL trip plan.
+4. Do NOT follow fixed question order blindly.
+5. Be smart and context-aware.
 
-FINAL PLAN FORMAT (VERY IMPORTANT):
+6.If transport is not provided:
+- Suggest best transport based on distance
+- For nearby → car/bus
+- For long distance → train/flight
+FINAL PLAN FORMAT:
 
 🌴 {Destination} Travel Plan
 
@@ -32,87 +37,98 @@ FINAL PLAN FORMAT (VERY IMPORTANT):
 • From:
 • To:
 • Date:
-• Duration:
-• Group Size:
-
-🚆✈️ Travel Options
-• Flights:
-• Trains:
-• Buses:
-• Local Transport:
-
-🏨 Stay Suggestions
-• Best Areas:
-• Recommended Stay Type:
 
 🗓️ Day-wise Itinerary
 • Day 1:
-- Activity 1
-- Activity 2
+  - Activity 1
+  - Activity 2
 
 • Day 2:
-- Activity 1
-- Activity 2
+  - Activity 1
+  - Activity 2
 
-💰 Estimated Budget (Per Person)
+💰 Budget Estimate
 • Travel:
 • Stay:
 • Food:
-• Local Transport:
-• Activities:
-• Total:
 
 💡 Travel Tips
 • Tip 1
 • Tip 2
-• Tip 3
-
-🎯 Closing Note
 
 IMPORTANT:
-- Use clean formatting
-- Use bullet points
-- No long paragraphs
-- Output must be structured
+- Use bullet format
+- No unnecessary questions
+- Ask questions ONLY if clearly missing and important.
+- Do not repeat the same question again.
+- Never assume budget.
+- Always ask for budget if missing.
+- Always include transport suggestions based on destination.
+- Do not confuse number of days with budget.
+- If data is enough → generate plan directly
 `;
+
+// ================= GROQ =================
+
+async function generateWithGroq(conversationHistory) {
+  const url = "https://api.groq.com/openai/v1/chat/completions";
 
   try {
 
-    // 🔥 FIX: Proper role usage
-    const contents = [
-      {
-        role: "model",
-        parts: [{ text: systemInstruction }]
-      },
-      ...conversationHistory
+    // ✅ FIXED conversation mapping (NO CRASH)
+    const messages = [
+      { role: "system", content: SYSTEM_PROMPT },
+
+      ...conversationHistory.map(chat => ({
+        // ✅ FIXED role handling
+        role: chat.role === "model" ? "assistant" : "user",
+
+        // ✅ SAFE content extraction
+        content: chat.parts?.[0]?.text || chat.message || ""
+      }))
     ];
 
     const response = await axios.post(
       url,
       {
-        contents,
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 2048
-        }
+        // ✅ BEST MODEL (IMPORTANT FIX)
+        model: "llama-3.3-70b-versatile",
+
+        messages,
+
+        // ✅ Balanced output
+        temperature: 0.7,
+
+        max_tokens: 2048
       },
       {
         headers: {
+          Authorization: `Bearer ${GROQ_API_KEY}`,
           "Content-Type": "application/json"
         }
       }
     );
 
-    return (
-      response.data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "⚠️ Unable to generate trip plan."
-    );
+    const aiResponse =
+      response.data?.choices?.[0]?.message?.content ||
+      "⚠️ Unable to generate trip plan.";
+
+    // ================= RETURN =================
+    // ⚠️ IMPORTANT: yahi jagah pe tum weather/image add karte ho
+
+    return aiResponse;
 
   } catch (err) {
-    console.error("🔥 Gemini API Error:", err.response?.data || err.message);
+    console.error("🔥 Groq Error:", err.response?.data || err.message);
 
-    return "⚠️ AI service temporarily unavailable. Please try again.";
+    return fallback();
   }
+}
+
+// ================= FALLBACK =================
+
+function fallback() {
+  return "⚠️ AI service unavailable";
 }
 
 module.exports = generateTripPlan;
